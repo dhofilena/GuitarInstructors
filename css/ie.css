@@ -1,0 +1,94 @@
+/*+clearfix {*/
+.top:after, .searchArea:after, .searchArea FORM:after
+{
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+	font-size: 0;
+}
+.top, .searchArea, .searchArea FORM
+{
+	display: inline-block;
+}
+.top, .searchArea, .searchArea FORM
+{
+/*\*/
+	display: block;
+/**/
+	-height: 1px;
+}
+/*+}*/
+BODY
+{
+	text-align: center;
+	margin: 0px;
+	padding: 0px;
+	background: #000000 url(../images/bodyBg.jpg) no-repeat center top / cover;
+}
+/*[clearfix]*/.top
+{
+	/*[disabled]height:52px;*/
+	/*[disabled]outline:thin solid #FF1010;*/
+	/*[disabled]padding-top:56px;*/
+	/*[disabled]padding-bottom:15px;*/
+}
+.logo
+{
+	width: 446px;
+	height: 52px;
+	/*[disabled]outline:thin solid #FF1010;*/
+	float: none;
+	display: block;
+	margin: 0 auto;
+}
+/*[clearfix]*/.searchArea
+{
+	width: 272px;
+	height: 24px;
+	/*[disabled]outline:thin solid #FF1010;*/
+	float: none;
+	display: block;
+	margin: 25px auto 0;
+}
+/*[clearfix]*/.searchArea FORM
+{
+	/*[disabled]outline:thin solid #FF1010;*/
+	/*[disabled]+placement:float-left 0px 0px;*/
+	/*[disabled]width:150px;*/
+}
+.searchArea INPUT[type=text]
+{
+	/*[disabled]width:120px;*/
+	/*[disabled]height:24px;*/
+	/*[disabled]height:19px\0/;*/
+	/*[disabled]border:none;*/
+	/*[disabled]background-color:#252525;*/
+	/*[disabled]color:#C2C2C2;*/
+	/*[disabled]font-style:italic;*/
+	/*[disabled]font-size:12px;*/
+	/*[disabled]padding-left:5px;*/
+	/*[disabled]padding-right:25px;*/
+	/*[disabled]outline:thin solid #FF1010;*/
+	/*[disabled]padding-top:5px\0/;*/
+}
+.searchArea INPUT[type=image]
+{
+	/*[disabled]outline:thin solid #FF1010;*/
+	/*[disabled]+placement:float-right -3px -19px;*/
+}
+.searchArea IMG
+{
+	/*[disabled]outline:thin solid #FF1010;*/
+	/*[disabled]+placement:float-right 0px 0px;*/
+	/*[disabled]margin-left:5px;*/
+	/*[disabled]margin-top:2px;*/
+	/*[disabled]margin-top:6px\0/;*/
+}
+.findArea
+{
+	height: 339px;
+	outline: thin solid #FF1010;
+	background: transparent url(../images/findBg.png) no-repeat center top / contain;
+}
