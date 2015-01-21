@@ -67,6 +67,68 @@ Author: vherhonne
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
+.pre-head{
+	color: #3faeec;
+	font-size: 24px;
+	display: table;
+	margin: 0 auto;
+	font-style: italic;
+}
+.headline{
+	font-size: 36px;
+	margin: 0 auto;
+	display: table;
+	color: #fff;
+}
+input[type="text"].search_text, input[type="text"].snear{
+	height: 40px;
+	width: 230px;
+	font-family: Arial, Helvetica, sans-serif;
+	text-indent: 10px;
+}
+input[type="button"].geodir_submit_search{
+	background: #3faeec;
+	color: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	border: none;
+	height: 40px;
+}
+input[type="button"].geodir_submit_search:hover{
+	background-color: #fff835 !important;
+}
+.gi-cont{
+	background: url(images/contentBg.png) repeat;
+	width: 1000px;
+	margin: 0 auto;
+	padding: 40px 40px 13px;
+	overflow: auto;
+}
+.post{
+	display: block;
+	background-color: #fff;
+}
+.gi-fshadow{
+	background: url(images/contentShadow.png) no-repeat center top;
+	height: 27px;
+	margin: 0 auto;
+	clear: both;
+}
+body.home .post{
+	width: 620px;
+	float: left;
+	padding: 20px;
+}
+.site-content{
+	min-width: 1200px;
+}
+.cont-wrap{
+	display: table; 
+	background-color: #fff;
+}
+.gi-home-sidebar{
+	
+}
 
 /**
  * 1.0 Reset
@@ -621,7 +683,6 @@ input[type="reset"] {
 	padding: 11px 24px 10px;
 	text-decoration: none;
 }
-
 button:hover,
 button:focus,
 input[type="submit"]:hover,
@@ -630,9 +691,9 @@ input[type="reset"]:hover,
 input[type="submit"]:focus,
 input[type="button"]:focus,
 input[type="reset"]:focus {
-	background: #ed6a31; /* Old browsers */
-	background: -webkit-linear-gradient(top, #ed6a31 0%, #e55627 100%); /* Chrome 10+, Safari 5.1+ */
-	background:   linear-gradient(to bottom, #ed6a31 0%, #e55627 100%); /* W3C */
+	background: #3faeec; /* Old browsers */
+	background: -webkit-linear-gradient(top, #3faeec 0%, #0099cc 100%); /* Chrome 10+, Safari 5.1+ */
+	background:   linear-gradient(to bottom, #3faeec 0%, #0099cc 100%); /* W3C */
 	outline: none;
 }
 
@@ -836,6 +897,7 @@ img.wp-smiley,
 	overflow: auto;
 	background: url(images/top-bg.png) repeat-x center top;
 	height: 107px;
+	min-width: 1200px;
 }
 
 .site-header .home-link {
@@ -1015,6 +1077,7 @@ ul.nav-menu .focus > ul,
 	margin: 0 auto;
 	max-width: 604px;
 	width: 100%;
+	text-align: justify;
 }
 
 .sidebar .entry-header,
@@ -2570,7 +2633,7 @@ footer.entry-meta {
  */
 
 .site-footer {
-	background-color: #e8e5ce;
+	background: none;
 	color: #686758;
 	font-size: 14px;
 	text-align: center;

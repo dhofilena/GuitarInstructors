@@ -19,10 +19,17 @@ get_header(); ?>
 	<div id="primary" class="content-area">
 		<div id="content" class="site-content" role="home">
         <div id="search-list">
+          <div style="height:40px;"></div>
           <div class="pre-head">No more head bangin' on the wall...</div>
           <div class="headline">Find Your Guitar Instructor Now!</div>
           <?php dynamic_sidebar( 'geo-search' ); ?>
         </div>
+        <div class="gi-cont">
+        <!-- Add Featured Post script here-->
+        <div class="cont-wrap">
+        <div class="gi-feat post">
+        </div>
+        <!-- end of Featured Post -->
 		<?php if ( have_posts() ) : ?>
 
 			<?php /* The loop */ ?>
@@ -35,6 +42,11 @@ get_header(); ?>
 		<?php else : ?>
 			<?php get_template_part( 'content', 'none' ); ?>
 		<?php endif; ?>
+        
+        <?php get_sidebar( 'home' ); ?>
+        </div>
+        <div class="gi-fshadow"></div>
+        </div>
 
 		</div><!-- #content -->
 	</div><!-- #primary -->
