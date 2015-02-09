@@ -45,6 +45,10 @@ class geodir_popular_post_category extends WP_Widget {
 		
 		if( !empty( $terms ) ) {
 		?>
+        
+        
+            <div>Im in the right place</div>
+        
 			<div class="geodir-category-list-in clearfix">
 				<div class="geodir-cat-list clearfix">
 			<?php
