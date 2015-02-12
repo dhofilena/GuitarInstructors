@@ -10,7 +10,9 @@ echo '<div id="'.$id.'" class="'.$class.'">';
 }
 // action for adding the wrapperdiv closing tag
 add_action( 'geodir_wrapper_close', 'geodir_action_wrapper_close', 10,1);
-function geodir_action_wrapper_close($type=''){echo '</div><!-- wrapper ends here-->';}
+function geodir_action_wrapper_close($type=''){echo '</div><!-- cont-wrap -->
+<div class="gi-fshadow"></div>
+</div><!-- gi-cont --></div><!-- wrapper ends here-->';}
 
 // action for adding the content div opening tag
 add_action( 'geodir_wrapper_content_open', 'geodir_action_wrapper_content_open', 10, 3 );
@@ -20,7 +22,7 @@ elseif($type=='listings-page' && $width = get_option('geodir_width_listing_conta
 elseif($type=='search-page' && $width = get_option('geodir_width_search_contant_section') ) { $width_css = 'style="width:'.$width.'%;"'; }
 elseif($type=='author-page' && $width = get_option('geodir_width_author_contant_section') ) { $width_css = 'style="width:'.$width.'%;"'; }else{$width_css = '';}
 
-echo '<div id="'.$id.'" class="'.$class.'" role="main" '. $width_css.'>';
+echo '<div class="gi-cont"><div class="cont-wrap"><div id="'.$id.'" class="'.$class.'" role="main" '. $width_css.'>';
 }
 // action for adding the primary div closing tag
 add_action( 'geodir_wrapper_content_close', 'geodir_action_wrapper_content_close', 10,1);
@@ -646,7 +648,8 @@ function geodir_action_listings_title() {
 	$class = apply_filters( 'geodir_page_title_class', 'entry-title fn' );
 	$class_header = apply_filters( 'geodir_page_title_header_class', 'entry-header' );
 	
-	echo '<header class="'.$class_header.'"><h1 class="'.$class.'">'.apply_filters('geodir_listing_page_title',wptexturize($list_title)).'</h1></header>';
+	//echo '<header class="'.$class_header.'"><h1 class="'.$class.'"> this is the one'.apply_filters('geodir_listing_page_title',wptexturize($list_title)).'</h1></header>';
+	echo '<header class="'.$class_header.'"><h1 class="'.$class.'"> All Instructors </h1></header>';
 }
 
 add_action( 'geodir_listings_page_description', 'geodir_action_listings_description',10);
@@ -689,7 +692,7 @@ if($type=='home-page' && $width = get_option('geodir_width_home_left_section') )
 elseif($type=='listings-page' && $width = get_option('geodir_width_listing_left_section') ) { $width_css = 'style="width:'.$width.'%;"'; }
 elseif($type=='search-page' && $width = get_option('geodir_width_search_left_section') ) { $width_css = 'style="width:'.$width.'%;"'; }
 elseif($type=='author-page' && $width = get_option('geodir_width_author_left_section') ) { $width_css = 'style="width:'.$width.'%;"'; }else{$width_css = '';}
-
+echo '<header class="'.$class_header.'"><h1 class="'.$class.'"> All Instructors </h1></header>';
 echo '<aside  id="'.$id.'" class="'.$class.'" role="complementary" itemscope itemtype="'.$itemtype.'" '.$width_css .'>';
 }
 // action for adding the primary div closing tag
@@ -799,13 +802,14 @@ if(isset($_REQUEST['listing_type']) &&  $_REQUEST['listing_type']!='')
 $class = apply_filters( 'geodir_page_title_class', 'entry-title fn' );
 $class_header = apply_filters( 'geodir_page_title_header_class', 'entry-header' );
 echo '<header class="'.$class_header.'"><h1 class="'.$class.'">';
+			
             
             if(isset($_REQUEST['pid']) && $_REQUEST['pid']!= ''){
                 $post_type_info = geodir_get_posttype_info(get_post_type( $_REQUEST['pid'] ));	
                 echo apply_filters('geodir_add_listing_page_title_text',( ucwords(__('Edit',GEODIRECTORY_TEXTDOMAIN).' '.$post_type_info['labels']['singular_name'])));
             }elseif(isset($listing_type)){ 
                 $post_type_info = geodir_get_posttype_info($listing_type);	
-				 echo apply_filters('geodir_add_listing_page_title_text',( ucwords(__('Add',GEODIRECTORY_TEXTDOMAIN).' '.$post_type_info['labels']['singular_name'])));
+				 echo apply_filters('geodir_add_listing_page_title_text',( ucwords(__('Create',GEODIRECTORY_TEXTDOMAIN).' Profile ')));
             }else{ apply_filters('geodir_add_listing_page_title_text',the_title()); } 
 			echo '</h1></header>';
 }
@@ -1175,11 +1179,11 @@ function geodir_action_signup_forms(){
 	try{document.getElementById('user_login').focus();}catch(e){}
 </script>
 
-
 	<?php if((isset($errors->errors['invalidcombo']) && $errors->errors['invalidcombo'] != '') || (isset($errors->errors['empty_username']) && $errors->errors['empty_username'] != '')) {?>
 		<script type="text/javascript">document.getElementById('lostpassword_form').style.display = '';</script>
 	<?php } 
 }
+
 
 ###############################################
 ########### AUTHOR PAGE ACTIONS ###############

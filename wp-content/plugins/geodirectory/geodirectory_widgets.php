@@ -213,6 +213,11 @@ function register_geodir_widgets() {
 				?>
 				<li><a class="signin" href="<?php echo wp_logout_url( home_url() );?>"><?php _e( 'Logout', GEODIRECTORY_TEXTDOMAIN );?></a></li>
 				<?php 
+				
+				$post_types = geodir_get_posttypes( 'object' );
+				$show_add_listing_post_types_main_nav = get_option( 'geodir_add_listing_link_user_dashboard' );
+				$geodir_allow_posttype_frontend = get_option( 'geodir_allow_posttype_frontend' );		
+				
 				// My Favourites in Dashboard
 				$show_favorite_link_user_dashboard = get_option( 'geodir_favorite_link_user_dashboard' );
 				$user_favourite = geodir_user_favourite_listing_count();
@@ -280,15 +285,11 @@ function register_geodir_widgets() {
 					}
 				}
 				
-				// add new list
-				$post_types = geodir_get_posttypes( 'object' );
-				$show_add_listing_post_types_main_nav = get_option( 'geodir_add_listing_link_user_dashboard' );
-				$geodir_allow_posttype_frontend = get_option( 'geodir_allow_posttype_frontend' );				
-				
+				// add new list				
 				//debug out
-				echo  "<pre>";
-				print_r($show_add_listing_post_types_main_nav);
-				echo  "</pre>";
+				//echo  "<pre>";
+				//print_r($show_add_listing_post_types_main_nav);
+				//echo  "</pre>";
 				if( !empty( $show_add_listing_post_types_main_nav ) ) {
 					$addlisting_links = '';
 					foreach($post_types as $key => $postobj){
@@ -303,22 +304,28 @@ function register_geodir_widgets() {
 								if(geodir_get_current_posttype() == $key && geodir_is_page('add-listing')) 
 									$selected = 'selected="selected"';
 								
-								$addlisting_links .= '<option '.$selected.' value="'.$add_link.'">'.__( ucfirst( $name  ), GEODIRECTORY_TEXTDOMAIN ).'</option>';
+								//$addlisting_links .= '<option '.$selected.' value="'.$add_link.'">'.__( ucfirst( $name  ), GEODIRECTORY_TEXTDOMAIN ).'</option>';
+								
+								$addlisting_links = '<a href="'.$add_link.'" >'.__( ucfirst( "Create Profile" ), GEODIRECTORY_TEXTDOMAIN ). '</a>';
 								
 							}
 						}
 						
 					}	
 					//debug out
-					echo  "<pre>";
-					print_r($addlisting_links);
-					echo  "</pre>";
-					if($addlisting_links != ''){ ?>
+					//echo  "<pre>";
+					//print_r($addlisting_links);
+					//echo  "</pre>";
+					if($addlisting_links != '' && $listing_links == ""){ ?>
 					
+                        <!--
 						<li><select id="geodir_add_listing" class="chosen_select" onchange="window.location.href=this.value" option-autoredirect="1" name="geodir_add_listing" option-ajaxchosen="false" >
 						<option value="<?php echo home_url();?>"><?php _e('Add Listing',GEODIRECTORY_TEXTDOMAIN);?></option>
 						<?php echo $addlisting_links;?>
-						</select></li> <?php 
+						</select></li>
+                        -->
+                        <?php echo $addlisting_links;?>
+                        <?php 
 						
 					}
 				
@@ -338,7 +345,7 @@ function register_geodir_widgets() {
 					<input type="hidden" name="redirect_to" value="<?php echo geodir_curPageURL(); ?>" />
 					<input type="hidden" name="testcookie" value="1" />
 					<div class="geodir_form_row clearfix">                    
-                    <?php do_action('oa_social_login'); ?>  
+                     <?php do_action( 'wordpress_social_login' ); ?>   
                     <input type="submit" name="submit" value="<?php echo SIGN_IN_BUTTON;?>" class="b_signin"/><p class="geodir-new-forgot-link">   
                     <a href="<?php echo home_url(); ?>/?geodir_signup=true&amp;page1=sign_up" class="goedir-newuser-link"><?php echo NEW_USER_TEXT;?></a>  
                     

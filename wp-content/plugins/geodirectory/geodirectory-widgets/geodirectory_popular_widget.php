@@ -46,9 +46,7 @@ class geodir_popular_post_category extends WP_Widget {
 		if( !empty( $terms ) ) {
 		?>
         
-        
-            <div>Im in the right place</div>
-        
+            <div>Im at the right place</div>
 			<div class="geodir-category-list-in clearfix">
 				<div class="geodir-cat-list clearfix">
 			<?php
@@ -77,6 +75,7 @@ class geodir_popular_post_category extends WP_Widget {
 			echo '</ul>';
 			?>
 			</div> 
+			</div>
 		<?php 
 			if( $cat_count > $categ_limit ) {
 				echo '<a href="javascript:void(0)" class="geodir-morecat geodir-showcat">' . __( 'More Categories', GEODIRECTORY_TEXTDOMAIN ) . '</a>';
@@ -84,8 +83,9 @@ class geodir_popular_post_category extends WP_Widget {
 				/* add scripts */
 				add_action( 'wp_footer', array($this, 'geodir_popular_category_add_scripts'), 100 );
 			}
-			echo $after_widget;
+			
 		}
+		echo $after_widget;
 	}
 	
 	function geodir_popular_category_add_scripts() {
@@ -194,7 +194,7 @@ class geodir_popular_postview extends WP_Widget {
 		}
 	
 		if ( empty( $title ) || $title == 'All' ){
-			$title .= ' '. get_post_type_plural_label( $post_type );
+			$title .= ' '. __( get_post_type_plural_label( $post_type ), GEODIRECTORY_TEXTDOMAIN );
 		}
 	
 		$location_url = array();
@@ -284,7 +284,7 @@ class geodir_popular_postview extends WP_Widget {
 			$query_args['tax_query'] = array( $tax_query );
 		}
 	
-		global $gridview_columns, $geodir_is_widget_listing;
+		global $gridview_columns_widget, $geodir_is_widget_listing;
 		
 		$widget_listings = geodir_get_widget_listings( $query_args );
 		
@@ -300,13 +300,13 @@ class geodir_popular_postview extends WP_Widget {
 			<?php 
 			if ( strstr( $layout, 'gridview' ) ) {
 				$listing_view_exp = explode( '_', $layout );
-				$gridview_columns = $layout;
+				$gridview_columns_widget = $layout;
 				$layout = $listing_view_exp[0];
 			} else {
-				$gridview_columns = '';
+				$gridview_columns_widget  = '';
 			}
 			
-			$template = apply_filters( "geodir_template_part-listing-listview", geodir_plugin_path() . '/geodirectory-templates/widget-listing-listview.php' );
+			$template = apply_filters( "geodir_template_part-widget-listing-listview", geodir_plugin_path() . '/geodirectory-templates/widget-listing-listview.php' );
 			if ( !isset( $character_count ) ) {
 				$character_count = $character_count == '' ? 50 : apply_filters( 'widget_character_count', $character_count );
 			}
@@ -421,7 +421,7 @@ class geodir_popular_postview extends WP_Widget {
 		?>
         
         <p>
-            <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:',GEODIRECTORY_TEXTDOMAIN);?>
+            <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:',GEODIRECTORY_TEXTDOMAIN);?> <small>(%posttype_singular_label% , %posttype_plural_label% <?php _e('can be used',GEODIRECTORY_TEXTDOMAIN);?>)</small>
             
             	<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
             </label>

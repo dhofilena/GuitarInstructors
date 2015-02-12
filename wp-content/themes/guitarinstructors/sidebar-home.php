@@ -5,12 +5,6 @@
  */
 ?>
 <div class="gi-home-sidebar">
-  <!-- Login Section -->
-  <div class="gi-login">  
-    <?php do_action( 'wordpress_social_login' ); ?> 
-  </div>
-  <!-- end Login Section -->
-  
   <!-- Popular Post -->
   <div class="gi-popular">
   </div>

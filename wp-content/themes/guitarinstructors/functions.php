@@ -95,7 +95,8 @@ function twentythirteen_setup() {
 
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menu( 'primary', __( 'Navigation Menu', 'twentythirteen' ) );
-
+	register_nav_menu( 'bottom', __( 'Footer Menu', 'twentythirteen' ) );
+	register_nav_menu( 'bottom2', __( 'Disclaimer Menu', 'twentythirteen' ) );
 	/*
 	 * This theme uses a custom image size for featured images, displayed on
 	 * "standard" posts and pages.
@@ -251,6 +252,34 @@ function twentythirteen_widgets_init() {
 		'name'          => __( 'Search List Widget', 'twentythirteen' ),
 		'id'            => 'geo-search',
 		'description'   => __( 'Appears on homepage for searching listing.', 'twentythirteen' ),
+	) );
+	
+	register_sidebar( array(
+		'name'          => __( 'Search Blog Widget', 'twentythirteen' ),
+		'id'            => 'blog-search',
+		'description'   => __( 'Appears on blog for searching posts.', 'twentythirteen' ),
+		'before_widget' => '<div id="blog-search">',
+		'after_widget'  => '</div>',
+	) );
+	
+	register_sidebar( array(
+		'name'          => __( 'Main Top Widget', 'twentythirteen' ),
+		'id'            => 'main-top',
+		'description'   => __( 'For featured posts', 'twentythirteen' ),
+		'before_widget' => '<div id="gi-feat">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3 class="widget-title">',
+		'after_title'   => '</h3>',
+	) );
+	
+	register_sidebar( array(
+		'name'          => __( 'Sidebar Home Widget', 'twentythirteen' ),
+		'id'            => 'side-home',
+		'description'   => __( 'For Dashboard and Popular Posts', 'twentythirteen' ),
+		'before_widget' => '<div id="side-home">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3 class="widget-title">',
+		'after_title'   => '</h3>',
 	) );
 }
 add_action( 'widgets_init', 'twentythirteen_widgets_init' );
@@ -481,7 +510,7 @@ function twentythirteen_excerpt_more( $more ) {
 	$link = sprintf( '<a href="%1$s" class="more-link">%2$s</a>',
 		esc_url( get_permalink( get_the_ID() ) ),
 			/* translators: %s: Name of current post */
-			sprintf( __( 'Continue reading %s <span class="meta-nav">&rarr;</span>', 'twentythirteen' ), '<span class="screen-reader-text">' . get_the_title( get_the_ID() ) . '</span>' )
+			sprintf( __( 'read more %s <span class="meta-nav">&rarr;</span>', 'twentythirteen' ), '<span class="screen-reader-text">' . get_the_title( get_the_ID() ) . '</span>' )
 		);
 	return ' &hellip; ' . $link;
 }

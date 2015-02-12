@@ -25,3 +25,5 @@ wp-content/plugins/wordpress-social-login/hybridauth/endpoints/readme.md
 wp-content/plugins/wordpress-social-login/LICENSE
 wp-content/plugins/wordpress-social-login/readme.txt
 wp-content/plugins/webcretix_social_login_plugin/fb_app_script.js
+*.txt
+*.pot

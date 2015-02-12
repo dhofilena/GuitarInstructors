@@ -26,24 +26,70 @@ get_header(); ?>
         </div>
         <div class="gi-cont">
         <!-- Add Featured Post script here-->
+        <?php
+            $lastposts = get_posts(array('category_name' => 'featured-post'));
+			
+			if(count($lastposts) >= 1){
+        ?>
         <div class="cont-wrap">
-        <div class="gi-feat post">
+          <div id="gi-feat">
+			
+			<?php
+            foreach ( $lastposts as $post ) :
+              setup_postdata( $post ); ?>
+              
+            <div class="feat-img">        
+              <?php the_post_thumbnail( 'full' ); ?>
+            </div>             
+            
+            <div class="feat-cont">               
+              <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+              <?php get_the_post_thumbnail( $post->ID ); ?>
+              <p><?php echo substr(get_the_excerpt(), 0,150); ?><a href="<?php the_permalink(); ?>">[...]</a></p>
+              <a href="<?php the_permalink(); ?>" class="feat-btn">Read More &rarr;</a>
+              <?php endforeach; ?>
+            </div>
+
+          </div>
         </div>
+                
         <!-- end of Featured Post -->
-		<?php if ( have_posts() ) : ?>
-
-			<?php /* The loop */ ?>
-			<?php while ( have_posts() ) : the_post(); ?>
-				<?php get_template_part( 'content', get_post_format() ); ?>
-			<?php endwhile; ?>
-
-			<?php twentythirteen_paging_nav(); ?>
-
-		<?php else : ?>
-			<?php get_template_part( 'content', 'none' ); ?>
-		<?php endif; ?>
+        <div class="gi-fshadow"></div>
+        <?php 
+		}
+		?>
         
-        <?php get_sidebar( 'home' ); ?>
+        <div style="height:10px;"></div>
+        <div class="cont-wrap">
+          <div class="main-cont">
+			<?php if ( have_posts() ) : ?>
+    
+                <?php /* The loop */ ?>
+                <?php while ( have_posts() ) : the_post(); ?>
+                
+                    <?php
+					  
+					  $cat = get_the_category();
+					  
+					 if($cat[0]->object_id != 97){
+					 	get_template_part( 'content-home', get_post_format() ); 
+					 }
+					 ?>
+                <?php endwhile; ?>
+    
+                <?php twentythirteen_paging_nav(); ?>
+    
+            <?php 
+				else : 					
+		             get_template_part( 'content', 'none' ); ?>
+            <?php 
+					
+			endif; ?>
+          </div>
+        
+		  <?php if ( is_active_sidebar( 'side-home' ) ) : ?>
+              <?php dynamic_sidebar( 'side-home' ); ?>
+          <?php endif; ?>
         </div>
         <div class="gi-fshadow"></div>
         </div>

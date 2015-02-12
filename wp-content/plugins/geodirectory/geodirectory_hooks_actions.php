@@ -72,6 +72,7 @@ add_filter('parse_query', 'geodir_modified_query');
 ////////////////////////
 
 //add_action( 'wp_loaded','geodir_flush_rewrite_rules' );
+add_action( 'wp_loaded','geodir_on_wp_loaded',10 );
 
 
 /////////////////////////////
@@ -174,17 +175,17 @@ add_action('wp_head', 'geodir_add_meta_keywords');
 add_action('wp_footer','geodir_add_sharelocation_scripts'); 
 //}
 
-// Add fontawesome
-add_action('wp_head','geodir_add_fontawesome'); 
-add_action('admin_head','geodir_add_fontawesome'); 
-function geodir_add_fontawesome(){
-	echo apply_filters('geodir_fontawesome','<link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">');
-}
 
 /// add action for theme switch to blank previous theme navigation location setting 
 add_action("switch_theme", "geodir_unset_prev_theme_nav_location", 10 , 2); 
 function geodir_unset_prev_theme_nav_location($newname, $newtheme) {
+	
+	$geodir_theme_location = get_option('geodir_theme_location_nav_'.$newname);
+	if($geodir_theme_location){
+	update_option('geodir_theme_location_nav', $geodir_theme_location);
+	}else{
 	update_option('geodir_theme_location_nav', '');
+	}
 }
 
 
@@ -352,8 +353,8 @@ function geodir_social_sharing_buttons()
 	{?>
                 <div class="likethis">
                     	 <a href="http://twitter.com/share" class="twitter-share-button"><?php _e('Tweet',GEODIRECTORY_TEXTDOMAIN);?></a>
-                        <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script> 
-                    	<iframe <?php if (isset($_SERVER['HTTP_USER_AGENT']) && (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false)){echo 'allowtransparency="true"'; }?> class="facebook" src="http://www.facebook.com/plugins/like.php?href=<?php echo urlencode(get_permalink($post->ID)); ?>&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light" style="border:none; overflow:hidden; width:100px; height:20px"></iframe> 
+                        <script type="text/javascript" src="//platform.twitter.com/widgets.js"></script> 
+                    	<iframe <?php if (isset($_SERVER['HTTP_USER_AGENT']) && (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false)){echo 'allowtransparency="true"'; }?> class="facebook" src="//www.facebook.com/plugins/like.php?href=<?php echo urlencode(get_permalink($post->ID)); ?>&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light" style="border:none; overflow:hidden; width:100px; height:20px"></iframe> 
                     
                         <div id="plusone-div" class="g-plusone" data-size="medium"></div>
                         <script type="text/javascript">
@@ -484,11 +485,10 @@ function geodir_detail_page_review_rating() {
 	do_action('geodir_before_detail_page_review_rating') ;
 	
 	$comment_count = geodir_get_review_count_total($post->ID);
-	$post_ratings = geodir_get_postoverall($post->ID);
+	$post_avgratings = geodir_get_post_rating($post->ID);
 	
-	if ($post_ratings != 0 && !$preview) {
-		$post_avgratings = geodir_get_commentoverall_number($post->ID);
-		
+	if ($post_avgratings != 0 && !$preview) {
+	
 		do_action('geodir_before_review_rating_stars_on_detail' , $post_avgratings , $post->ID) ;
 		
 		$html = '<p style=" float:left;">';
@@ -547,10 +547,19 @@ function geodir_detail_page_more_info()
 }
 
 function geodir_localize_all_js_msg()
-{
+{// check_ajax_referer function is used to make sure no files are uplaoded remotly but it will fail if used between https and non https so we do the check below of the urls
+		if(str_replace("https","http",admin_url('admin-ajax.php')) && !empty($_SERVER['HTTPS'])){
+		$ajax_url =	 admin_url('admin-ajax.php');
+		}elseif(!str_replace("https","http",admin_url('admin-ajax.php')) && empty($_SERVER['HTTPS'])){
+		$ajax_url =	 admin_url('admin-ajax.php');	
+		}elseif(str_replace("https","http",admin_url('admin-ajax.php')) && empty($_SERVER['HTTPS'])){
+		$ajax_url =	 str_replace("https","http",admin_url('admin-ajax.php'));	
+		}elseif(!str_replace("https","http",admin_url('admin-ajax.php')) && !empty($_SERVER['HTTPS'])){
+		$ajax_url =	 str_replace("http","https",admin_url('admin-ajax.php'));	
+		}
 	$arr_alert_msg = array(
 							'geodir_plugin_url' => geodir_plugin_url(),
-							'geodir_admin_ajax_url' => admin_url('admin-ajax.php'),
+							'geodir_admin_ajax_url' => $ajax_url,
 							
 							'custom_field_not_blank_var' =>__('HTML Variable Name must not be blank',GEODIRECTORY_TEXTDOMAIN),
 						
@@ -606,7 +615,10 @@ function geodir_localize_all_js_msg()
 							'gd_cmt_btn_reply_text' => __( 'Reply text', GEODIRECTORY_TEXTDOMAIN ),
 							'gd_cmt_btn_post_review' => __( 'Post Review', GEODIRECTORY_TEXTDOMAIN ),
 							'gd_cmt_btn_review_text' => __( 'Review text', GEODIRECTORY_TEXTDOMAIN ),
+							'gd_cmt_err_no_rating' => __( "Please select star rating, you can't leave a review without stars.", GEODIRECTORY_TEXTDOMAIN ),
 						);
+	
+	$arr_alert_msg = apply_filters( 'geodir_all_js_msg', $arr_alert_msg );
 	
 	foreach ( $arr_alert_msg as $key => $value ) 
 	{
@@ -820,20 +832,20 @@ function geodir_changes_in_custom_fields_table(){
 	global $wpdb,$plugin_prefix;
 	
 	// updated custom field table(add field to show custom field as a tab)
-	if (!$wpdb->get_var("SHOW COLUMNS FROM ".GEODIR_CUSTOM_FIELDS_TABLE." WHERE field = 'show_as_tab'")) {
+	/*if (!$wpdb->get_var("SHOW COLUMNS FROM ".GEODIR_CUSTOM_FIELDS_TABLE." WHERE field = 'show_as_tab'")) {
 		$wpdb->query("ALTER TABLE `".GEODIR_CUSTOM_FIELDS_TABLE."` ADD `show_as_tab` ENUM( '0', '1' ) NOT NULL DEFAULT '0' AFTER `show_on_detail`");
 	}
 	
 	if (!$wpdb->get_var("SHOW COLUMNS FROM ".GEODIR_CUSTOM_FIELDS_TABLE." WHERE field = 'for_admin_use'")) {
 		$wpdb->query("ALTER TABLE `".GEODIR_CUSTOM_FIELDS_TABLE."` ADD `for_admin_use` ENUM( '0', '1' ) NOT NULL DEFAULT '0'");
-	}
+	}*/
 	
 	if(!get_option('geodir_changes_in_custom_fields_table')){
 	
 		$post_types = geodir_get_posttypes();
 	
-		if(!$wpdb->get_var("SHOW COLUMNS FROM ".GEODIR_CUSTOM_FIELDS_TABLE." WHERE field = 'is_admin'"))
-					$wpdb->query("ALTER TABLE `".GEODIR_CUSTOM_FIELDS_TABLE."` ADD `is_admin` ENUM( '0', '1' ) NOT NULL DEFAULT '0' AFTER `is_default`");
+		/*if(!$wpdb->get_var("SHOW COLUMNS FROM ".GEODIR_CUSTOM_FIELDS_TABLE." WHERE field = 'is_admin'"))
+					$wpdb->query("ALTER TABLE `".GEODIR_CUSTOM_FIELDS_TABLE."` ADD `is_admin` ENUM( '0', '1' ) NOT NULL DEFAULT '0' AFTER `is_default`");*/
 		
 		$wpdb->query(
 			$wpdb->prepare(
@@ -1006,11 +1018,11 @@ function geodir_custom_page_title($title='', $sep='')
 				if(!empty($title))
 				{
 					$title_array = explode($sep , $title);
-					$title_array[0] = ucwords(__('Add',GEODIRECTORY_TEXTDOMAIN).' '.$post_type_info['labels']['singular_name']).' ';
+					$title_array[0] = ucwords(__('Add',GEODIRECTORY_TEXTDOMAIN).' '. __( $post_type_info['labels']['singular_name'] , GEODIRECTORY_TEXTDOMAIN) ).' ';
 					$title = implode($sep, $title_array);
 				}
 				else
-					$title = ucwords(__('Add',GEODIRECTORY_TEXTDOMAIN).' '.$post_type_info['labels']['singular_name']);
+					$title = ucwords(__('Add',GEODIRECTORY_TEXTDOMAIN).' '. __( $post_type_info['labels']['singular_name'] , GEODIRECTORY_TEXTDOMAIN));
 				//$title .= " " . $gd_country . $gd_region . $gd_city  . "$sep ";
 			}
 		}
@@ -1163,7 +1175,7 @@ add_filter( 'post_type_archive_title', 'geodir_post_type_archive_title', 10, 1 )
 function geodir_post_type_archive_title( $title )
 {
 	global $wp_query, $wp, $wpdb;
-	
+	$title = str_replace("Location", __( 'Location', GEODIRECTORY_TEXTDOMAIN ),$title );
 	$wpseo_edit = false;
 	$current_term = $wp_query->get_queried_object();
 	
@@ -1175,7 +1187,7 @@ function geodir_post_type_archive_title( $title )
 	}
 	
 	if( geodir_is_geodir_page() && ( is_tax() || $current_term->ID == get_option( 'geodir_location_page' ) || ( is_archive() && !$current_term->ID && !( is_tax() || $current_term->ID == get_option( 'geodir_location_page' ) ) ) ) ) {
-		
+		$title = $title != '' ? __( $title, GEODIRECTORY_TEXTDOMAIN ) : '';
 		####### FIX FOR YOAST SEO START ########
 		$separator_options = array(
 					'sc-dash'    => '-',
@@ -1233,14 +1245,14 @@ function geodir_post_type_archive_title( $title )
 		$gd_post_type = geodir_get_current_posttype();
 		$post_type_info = get_post_type_object( $gd_post_type );
 		
-		if( get_query_var( $gd_post_type . 'category' ) ) {
+		/*if( get_query_var( $gd_post_type . 'category' ) ) {
 			$gd_taxonomy = $gd_post_type . 'category';
 			$taxonomy_title = __( ' with category ', GEODIRECTORY_TEXTDOMAIN );
 		}
 		else if( get_query_var( $gd_post_type . '_tags' ) ) {
 			$gd_taxonomy = $gd_post_type . '_tags';
 			$taxonomy_title = __( ' with tag ', GEODIRECTORY_TEXTDOMAIN );
-		}
+		}*/
 			
 		if ( !empty( $gd_taxonomy ) ) {
 			$taxonomy_titles = array();
@@ -1265,7 +1277,7 @@ function geodir_post_type_archive_title( $title )
 	}
 	
 	####### FIX FOR YOAST SEO START ########	
-	if( $wpseo_edit ) {
+	if( $wpseo_edit && isset($title_parts[1]) ) {
 		$title = $title . ' ' . $sep . ' '. $title_parts[1];
 	}
 	####### FIX FOR YOAST SEO END ########
@@ -1494,7 +1506,7 @@ function geodir_user_post_listing_count() {
 		foreach ( $all_posts as $ptype ) {
 			$total_posts = $wpdb->get_var( "SELECT count( ID )
 											FROM ".$wpdb->prefix."posts
-											WHERE post_author=".$user_id." AND post_type='".$ptype."' AND post_status = 'publish'" );
+											WHERE post_author=".$user_id." AND post_type='".$ptype."' AND ( post_status = 'publish' OR post_status = 'draft' OR post_status = 'private' )" );
 			
 			if( $total_posts > 0 ) {
 				$user_listing[$ptype] = $total_posts;
@@ -1522,7 +1534,7 @@ function geodir_user_favourite_listing_count(){
 		foreach ( $all_posts as $ptype ) {
 			$total_posts = $wpdb->get_var( "SELECT count( ID )
 											FROM ".$wpdb->prefix."posts
-											WHERE post_author=".$user_id." AND post_type='".$ptype."' AND post_status = 'publish' AND ID IN (".$user_favorites.")" );
+											WHERE  post_type='".$ptype."' AND post_status = 'publish' AND ID IN (".$user_favorites.")" );
 			
 			if ( $total_posts > 0 ) {
 				$user_listing[$ptype] = $total_posts;
@@ -1548,6 +1560,26 @@ function geodir_detail_page_custom_field_tab($tabs_arr) {
 				
 		$custom_fields = geodir_post_custom_fields($post_package_id, 'default', $post_type, $fields_location);
 		if (!empty($custom_fields)) {
+			$parse_custom_fields = array();
+			foreach ( $custom_fields as $field ) {
+				$type = $field;
+				$field_name = $field['htmlvar_name'];
+				if ( empty( $geodir_post_info ) && geodir_is_page('preview') && $field_name != '' && !isset($post->$field_name) && isset( $_REQUEST[$field_name] ) ) {
+					$post->$field_name = $_REQUEST[$field_name];
+				}
+				
+				if (isset($field['show_as_tab']) && $field['show_as_tab']==1 && ( ( isset($post->$field_name) && $post->$field_name != '' ) || $field['type'] == 'fieldset' ) && in_array($field['type'], array('text', 'datepicker', 'textarea', 'time', 'phone', 'email', 'select', 'multiselect', 'url', 'html', 'fieldset', 'radio', 'checkbox', 'file'))) {
+					if ( $type['type'] == 'datepicker' && ( $post->$type['htmlvar_name'] == '' || $post->$type['htmlvar_name'] == '0000-00-00' ) ) {
+						continue;
+					}
+					
+					$parse_custom_fields[] = $field;
+				}
+			}
+			$custom_fields = $parse_custom_fields;
+		}
+		
+		if (!empty($custom_fields)) {
 			$field_set_start = 0;
 			$fieldset_count = 0;
 			$fieldset = '';
@@ -1564,7 +1596,7 @@ function geodir_detail_page_custom_field_tab($tabs_arr) {
 					$post->$field_name = $_REQUEST[$field_name];
 				}
 				
-				if (isset($field['show_as_tab']) && $field['show_as_tab']==1 && ( ( isset($post->$field_name) && $post->$field_name != '' ) || $field['type'] == 'fieldset' ) && in_array($field['type'], array('text', 'datepicker', 'textarea', 'time', 'phone', 'email', 'select', 'multiselect', 'url', 'html', 'fieldset', 'radio', 'checkbox'))) {
+				if (isset($field['show_as_tab']) && $field['show_as_tab']==1 && ( ( isset($post->$field_name) && $post->$field_name != '' ) || $field['type'] == 'fieldset' ) && in_array($field['type'], array('text', 'datepicker', 'textarea', 'time', 'phone', 'email', 'select', 'multiselect', 'url', 'html', 'fieldset', 'radio', 'checkbox', 'file'))) {
 					$label = $field['site_title']!='' ? $field['site_title'] : $field['admin_title'];
 					$site_title = trim( $field['site_title'] );
 					$type = $field;
@@ -1867,6 +1899,66 @@ function geodir_detail_page_custom_field_tab($tabs_arr) {
 							$html .= ' </span>'.wpautop(stripslashes($post->$type['htmlvar_name'])).'</div>';	
 						}
 						break;
+						case 'file': {
+							$html_var = $type['htmlvar_name'];
+							
+							if ( !empty( $post->$type['htmlvar_name'] ) ) {
+								$files = explode( ",", $post->$type['htmlvar_name'] );
+								
+								if ( !empty( $files ) ) {
+									$file_paths = '';
+									foreach ( $files as $file ) {
+										if ( !empty( $file ) ) {
+											$filetype = wp_check_filetype( $file );
+											$image_name_arr = explode( '/', $file );
+											$curr_img_dir = $image_name_arr[count( $image_name_arr ) - 2];
+											$filename = end( $image_name_arr );
+											$img_name_arr = explode( '.', $filename );
+											
+											$arr_file_type = wp_check_filetype( $filename );
+											$uploaded_file_type = $arr_file_type['type'];
+											
+											$allowed_file_types = array( 'application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv', 'text/plain' );
+											
+											// If the uploaded file is the right format
+											if ( in_array( $uploaded_file_type, $allowed_file_types ) ) {
+												$ext_path = '_' . $html_var . '_';
+												
+												$filename = explode( $ext_path, $filename );
+												
+												$file_paths .= '<a href="' . $file . '" target="_blank">' . $filename[count( $filename ) - 1] . '</a>';
+											} else {
+												$file_paths .= '<div class="geodir-custom-post-gallery" class="clearfix">';
+												$file_paths .= geodir_show_image( array( 'src' => $file ), 'thumbnail', false, false );
+												//$file_paths .= '<img src="'.$file.'"  />';
+												$file_paths .= '</div>';
+											}
+										}
+									}
+									
+									if ( strpos( $field_icon, 'http' ) !== false ) {
+										$field_icon_af = '';
+									} else if( $field_icon == '' ) {
+										$field_icon_af = '';
+									} else { 
+										$field_icon_af = $field_icon;
+										$field_icon = '';
+									}
+									
+									$geodir_odd_even = $field_set_start == 1 && $i%2==0 ? 'geodir_more_info_even' : 'geodir_more_info_odd';
+									
+									
+									$html = '<div class="geodir_more_info '.$geodir_odd_even.' '.$type['css_class'].' '.$type['htmlvar_name'].' geodir-custom-file-box" style="clear:both;"><span class="geodir-i-file" style="display:inline-block;vertical-align:top;padding-right:14px;'.$field_icon.'">'.$field_icon_af;
+															
+									if ( $field_set_start == 1 && $site_title != '' ) {
+										$html .= ' '.__( $site_title, GEODIRECTORY_TEXTDOMAIN ).': ';
+									}
+									
+									$html .= ' </span>'.$file_paths.'</div>';
+								}
+							}
+						}
+						break;
 					}
 					if ( $field_set_start == 1 ) {
 						$add_html = false;
@@ -1915,3 +2007,146 @@ function geodir_detail_page_custom_field_tab($tabs_arr) {
 
 /* display add listing page for wpml */
 add_filter( 'option_geodir_add_listing_page', 'get_page_id_geodir_add_listing_page', 10, 2 );
+
+/*
+ * hook action for post updated
+ */
+add_action( 'post_updated', 'geodir_function_post_updated', 16, 3 );
+
+
+
+add_action('geodir_after_edit_post_link_on_listing', 'geodir_add_post_status_author_page', 11);
+
+function geodir_add_post_status_author_page(){
+	global $wpdb,$post;
+		
+	$html = '';
+	if (get_current_user_id() ) {
+		if ( geodir_is_page('author') && !empty( $post ) && isset( $post->post_author ) && $post->post_author == get_current_user_id() ) {
+			
+			// we need to query real status direct as we dynamically change the status for author on author page so even non author status can view them.
+			$real_status = $wpdb->get_var("SELECT post_status from $wpdb->posts WHERE ID=$post->ID");
+			$status = "<strong>(";
+			$status_icon = '<i class="fa fa-play"></i>';
+			if($real_status=='publish'){
+			$status .= __( 'Published', GEODIRECTORY_TEXTDOMAIN );
+			}else{
+			$status .= __( 'Not published', GEODIRECTORY_TEXTDOMAIN );
+			$status_icon = '<i class="fa fa-pause"></i>';
+			}
+			$status .= ")</strong>";
+			
+			$html = '<span class="geodir-post-status">'.$status_icon.' <font class="geodir-status-label">' . __( 'Status: ', GEODIRECTORY_TEXTDOMAIN ) . '</font>'.$status.'</span>';
+		}
+	}
+	
+	if ( $html != '' ) {
+		echo apply_filters( 'geodir_filter_status_text_on_author_page', $html );
+	}	
+	
+	
+}
+
+// remove rating stars fields if disabled
+add_action( 'init', 'geodir_init_no_rating', 100 );
+function geodir_init_no_rating() {
+	if ( get_option( 'geodir_disable_rating' ) ) {
+		remove_action( 'comment_form_logged_in_after', 'geodir_comment_rating_fields' );
+		remove_action( 'comment_form_before_fields', 'geodir_comment_rating_fields' );
+		remove_action( 'comment_form_logged_in_after', 'geodir_reviewrating_comment_rating_fields' );
+		remove_action( 'comment_form_before_fields', 'geodir_reviewrating_comment_rating_fields' );
+		remove_action( 'add_meta_boxes_comment', 'geodir_comment_add_meta_box' );
+		remove_action( 'add_meta_boxes', 'geodir_reviewrating_comment_metabox', 13 );
+		remove_filter( 'comment_text', 'geodir_wrap_comment_text', 10 );
+		
+		add_action( 'comment_form_logged_in_after', 'geodir_no_rating_rating_fields' );
+		add_action( 'comment_form_before_fields', 'geodir_no_rating_rating_fields' );
+		add_filter( 'comment_text', 'geodir_no_rating_comment_text', 100, 2 );
+		add_filter( 'geodir_detail_page_review_rating_html', 'geodir_no_rating_review_rating_html', 100 );
+		add_filter( 'geodir_get_sort_options', 'geodir_no_rating_get_sort_options', 100, 2 );
+	}
+}
+
+function geodir_no_rating_rating_fields() {
+	global $post;
+	
+	$post_types = geodir_get_posttypes();
+	
+	if( !empty( $post ) && isset( $post->post_type ) && in_array( $post->post_type, $post_types ) ) {
+		if ( is_plugin_active( 'geodir_review_rating_manager/geodir_review_rating_manager.php' ) ) {
+			echo '<input type="hidden" value="1" name="geodir_rating[overall]" />';
+			if( get_option( 'geodir_reviewrating_enable_images' ) ) {
+				geodir_reviewrating_rating_img_html();
+			}
+		} else {
+			echo '<input type="hidden" id="geodir_overallrating" name="geodir_overallrating" value="1" />';
+		}
+	}
+}
+
+function geodir_no_rating_comment_text( $content, $comment = '' ) {
+	if ( !is_admin() ) {
+		return '<div class="description">' . $content . '</div>';
+	} else {
+		return $content;
+	}
+}
+
+function geodir_no_rating_review_rating_html( $content = '' ) {
+	return NULL;
+}
+
+function geodir_no_rating_get_sort_options( $options, $post_type = '' ) {
+	$new_options = array();
+	if ( !empty( $options ) ) {
+		foreach( $options as $option ) {
+			if ( is_object( $option ) && isset( $option->htmlvar_name ) && $option->htmlvar_name == 'overall_rating' ) {
+				continue;
+			}
+			$new_options[] = $option;
+		}
+		
+		$options = $new_options;
+	}
+	
+	return $options;
+}
+
+// skip rating stars validation if rating stars disabled
+add_filter( 'geodir_all_js_msg', 'geodir_all_js_msg_no_rating', 100 );
+function geodir_all_js_msg_no_rating( $msg = array() ) {
+	if ( get_option( 'geodir_disable_rating' ) ) {
+		$msg['gd_cmt_no_rating'] = true;
+	}
+	
+	return $msg;
+}
+
+// add body class when rating stars if disabled
+add_filter( 'body_class', 'geodir_body_class_no_rating', 100 );
+function geodir_body_class_no_rating( $classes = array() ) {
+	if ( get_option( 'geodir_disable_rating' ) ) {
+		$classes[] = 'gd-no-rating';
+	}
+	
+	return $classes;
+}
+
+add_filter( 'admin_body_class', 'geodir_admin_body_class_no_rating', 100 );
+function geodir_admin_body_class_no_rating( $class = '' ) {
+	if ( get_option( 'geodir_disable_rating' ) ) {
+		$class .= ' gd-no-rating';
+	}
+	
+	return $class;
+}
+
+// hide rating stars if disabled
+add_action( 'wp_head', 'geodir_wp_head_no_rating' );
+add_action( 'admin_head', 'geodir_wp_head_no_rating' );
+function geodir_wp_head_no_rating() {
+	if ( get_option( 'geodir_disable_rating' ) ) {
+		echo '<style>body .geodir-rating, body .geodir-bubble-rating, body .gd_ratings_module_box{display:none!important;}</style>';
+		echo '<script type="text/javascript">jQuery(function(){jQuery(".gd_rating_show").parent(".geodir-rating").remove();});</script>';
+	}
+}

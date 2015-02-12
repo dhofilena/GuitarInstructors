@@ -11,12 +11,12 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<div id="content" class="site-content" role="main">
+        <div class="gi-cont">
+        <div class="cont-wrap">
 
 		<?php if ( have_posts() ) : ?>
 
-			<header class="page-header">
-				<h1 class="page-title"><?php printf( __( 'Search Results for: %s', 'twentythirteen' ), get_search_query() ); ?></h1>
-			</header>
+			<div class="search-title"><?php printf( __( 'Search Results for: %s', 'twentythirteen' ), get_search_query() ); ?></div>
 
 			<?php /* The loop */ ?>
 			<?php while ( have_posts() ) : the_post(); ?>
@@ -28,7 +28,11 @@ get_header(); ?>
 		<?php else : ?>
 			<?php get_template_part( 'content', 'none' ); ?>
 		<?php endif; ?>
-
+        
+        </div>
+        <div class="gi-fshadow"></div>
+        </div>
+        
 		</div><!-- #content -->
 	</div><!-- #primary -->
 

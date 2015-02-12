@@ -250,7 +250,7 @@ function geodir_get_current_posttype(){
 	
 	global $wp_query,$geodir_post_type;
 	
-	$geodir_post_type = get_query_var('post_type');	
+	$geodir_post_type = get_query_var('post_type');		
 		
 	if(geodir_is_page('add-listing') || geodir_is_page('preview')){	
 		if( isset($_REQUEST['pid']) && $_REQUEST['pid'] != '' )
@@ -966,8 +966,8 @@ function geodir_register_defaults() {
 	{
 			
 			$labels = array (
-			'name'          => __('Places', GEODIRECTORY_TEXTDOMAIN),
-			'singular_name' => __('Place', GEODIRECTORY_TEXTDOMAIN),
+			'name'          => __('Instructors', GEODIRECTORY_TEXTDOMAIN),
+			'singular_name' => __('Instructor', GEODIRECTORY_TEXTDOMAIN),
 			'add_new'       => __('Add New', GEODIRECTORY_TEXTDOMAIN),
 			'add_new_item'  => __('Add New Place', GEODIRECTORY_TEXTDOMAIN),
 			'edit_item'     => __('Edit Place', GEODIRECTORY_TEXTDOMAIN),
@@ -975,7 +975,8 @@ function geodir_register_defaults() {
 			'view_item'     => __('View Place', GEODIRECTORY_TEXTDOMAIN),
 			'search_items'  => __('Search Places', GEODIRECTORY_TEXTDOMAIN),
 			'not_found'     => __('No Place Found', GEODIRECTORY_TEXTDOMAIN),
-			'not_found_in_trash' => __('No Place Found In Trash', GEODIRECTORY_TEXTDOMAIN) );
+			'not_found_in_trash' => __('No Place Found In Trash', GEODIRECTORY_TEXTDOMAIN),
+			'profile'     => __('Profile', GEODIRECTORY_TEXTDOMAIN) );
 			
 			$place_default = array (
 			'labels' => $labels,	

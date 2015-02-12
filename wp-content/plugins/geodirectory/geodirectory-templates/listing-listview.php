@@ -89,7 +89,9 @@ if(isset($_SESSION['gd_listing_view']) && $_SESSION['gd_listing_view']!='' && !i
 									
 							
 								 <?php do_action('geodir_before_listing_post_excerpt', $post ); ?>
-								 <?php echo geodir_show_listing_info('listing');?>       
+								 <?php 
+								 	geodir_show_listing_info('listing');
+								 ?>       
 				<div class="geodir-entry-content"><p><?php if( isset( $character_count ) && ( $character_count || $character_count=='0' ) ) {
 				
 				echo geodir_max_excerpt($character_count);}else{ the_excerpt(); }?></p></div>

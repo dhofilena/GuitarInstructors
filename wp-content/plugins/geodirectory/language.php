@@ -30,10 +30,10 @@ define('CONTACT_NAME_TEXT',__('Name',GEODIRECTORY_TEXTDOMAIN));
 define('CONTACT_TEXT',__('Contact Number',GEODIRECTORY_TEXTDOMAIN));
 define('EMAIL_TEXT',__('Email',GEODIRECTORY_TEXTDOMAIN));
 
-define('LISTING_DETAILS_TEXT',__('Enter Listing Details',GEODIRECTORY_TEXTDOMAIN));
+define('LISTING_DETAILS_TEXT',__('Enter Profile Details',GEODIRECTORY_TEXTDOMAIN));
  
-define('PLACE_TITLE_TEXT',__('Listing Title',GEODIRECTORY_TEXTDOMAIN));
-define('PLACE_DESC_TEXT',__('Listing Description',GEODIRECTORY_TEXTDOMAIN));
+define('PLACE_TITLE_TEXT',__('Full Name',GEODIRECTORY_TEXTDOMAIN));
+define('PLACE_DESC_TEXT',__('Bio',GEODIRECTORY_TEXTDOMAIN));
 
 define('LISTING_ADDRESS_TEXT',__('Listing Address:',GEODIRECTORY_TEXTDOMAIN));
 define('PLACE_ADDRESS',__('Address:',GEODIRECTORY_TEXTDOMAIN));
@@ -122,7 +122,7 @@ define('WEBSITE_MSG',__('Enter website URL. eg. : <b>http://myplace.com</b>',GEO
 define('TWITTER_MSG',__('Enter twitter URL. eg. : <b>http://twitter.com/myplace</b>',GEODIRECTORY_TEXTDOMAIN));
 define('FACEBOOK_MSG',__('Enter facebook URL. eg. : <b>http://facebook.com/myplace</b>',GEODIRECTORY_TEXTDOMAIN));
 define('CATEGORY_MSG',__('Select listing category from here. Select at least one category',GEODIRECTORY_TEXTDOMAIN));
-define('TAGKW_MSG',__('Tags are short keywords, with no space within.(eg: tag1, tag2, tag3) Up to 40 characters only.',GEODIRECTORY_TEXTDOMAIN));
+define('TAGKW_MSG',__('Tags are short keywords, with no space within. This may be your music genre or influences (eg: jazz, blues, reggae) Up to 40 characters only.',GEODIRECTORY_TEXTDOMAIN));
 define('HTML_TAGS_ALLOW_MSG',__('Note : Basic HTML tags are allowed',GEODIRECTORY_TEXTDOMAIN));
 define('HTML_SPECIAL_TEXT',__('Note: List out any special offers (optional)',GEODIRECTORY_TEXTDOMAIN));
 define('IMAGE_SAVE_ORDERING_MSG',__('Note : You can sort images once the post is saved by clicking on "Edit" on the listing',GEODIRECTORY_TEXTDOMAIN));

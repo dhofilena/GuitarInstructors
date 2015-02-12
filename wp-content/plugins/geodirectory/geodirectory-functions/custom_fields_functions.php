@@ -1696,7 +1696,6 @@ function geodir_show_listing_info($fields_location=''){
 	
 	global $post, $preview, $wpdb;
 	
-	
 	$payment_info = array();	
 	$package_info = array();
 	
@@ -1705,6 +1704,7 @@ function geodir_show_listing_info($fields_location=''){
 	$post_package_id = $package_info->pid;
 	
 	ob_start();	$fields_info = geodir_post_custom_fields($post_package_id,'default',geodir_get_current_posttype(), $fields_location);
+	
 	
 	if(!empty($fields_info))
 	{
@@ -1745,7 +1745,6 @@ function geodir_show_listing_info($fields_location=''){
 				$field_icon = '<i class="'.$type['field_icon'].'"></i>';
 			}
 			//else{$field_icon = $type['field_icon'];}
-			
 			
 			switch($type['type'])
 			{
@@ -2443,6 +2442,7 @@ function geodir_show_listing_info($fields_location=''){
 								
 									$i++;
 								}
+
 								
 							$html = '<div class="geodir_more_info '.$geodir_odd_even.' '.$type['css_class'].' '.$type['htmlvar_name'].'" style="clear:both;"><span class="geodir-i-text" style="'.$field_icon.'">'.$field_icon_af;
 							$html .= (trim($type['site_title'])) ? __($type['site_title'],GEODIRECTORY_TEXTDOMAIN).': ' : '';
